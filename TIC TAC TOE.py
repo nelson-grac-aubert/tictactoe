@@ -10,6 +10,10 @@ player2_victory = False
 draw = False
 game_ended = False 
 
+player1_points = 0 # initializes a point counter to be display after each match 
+player2_points = 0
+
+
 player1_turn = random.choice([True, False]) # starts at random, player 1 plays first, when False, it's player2 or IA's turn to play 
 
 empty = "_" # for visualisation in the terminal 
@@ -56,6 +60,8 @@ def end_of_game(board) :
     if so, globally changes the value of game_ended to True 
     Returns None """
     global game_ended # the game_ended flag modifications has to be global so the gameplay loop can catch on it 
+    global player1_points
+    global player2_points
 
     player1_victory = False # initializes the bool flags that will become True when an end of game condition is met 
     player2_victory = False
@@ -72,6 +78,7 @@ def end_of_game(board) :
     if player1_victory : 
         print("Player 1 wins!")
         game_ended = True
+        player1_points += 1 
         
     if board[0] == board[1] == board[2] == "O" or board[3] == board[4] == board[5] == "O" or board[6] == board[7] == board[8] == "O" : 
         player2_victory = True # HORIZONTAL VICTORY FOR P2
@@ -83,6 +90,7 @@ def end_of_game(board) :
     if player2_victory : 
         print("Player 2 wins!")
         game_ended = True
+        player2_points += 1 
 
     played_case_counter = 0 # counts how many cases are played on 
     for element in board : 
@@ -144,6 +152,7 @@ while mode == 2 : # game loop that only stops if user inputs something other tha
             player1_turn = True
 
     if game_ended:     # a win / a draw is detected 
+        print(f"SCORE : PLAYER ONE {player1_points} : {player2_points} PLAYER TWO")
         replay = input("Play again? Type yes or no ").lower()  # ask the user if they wanna replay
         if replay == "yes" or replay == "y ":   
             board = [empty] * 9    # clears board
@@ -188,6 +197,7 @@ while mode == 1 : # game loop that only stops if user inputs something other tha
             player1_turn = True # Player's turn now
 
     if game_ended:     # a win / a draw is detected 
+        print(f"SCORE : PLAYER ONE {player1_points} : {player2_points} IA")
         replay = input("Play again? Type yes or no ").lower()  # ask the user if they wanna replay
         if replay == "yes" or replay == "y ":   
             board = [empty] * 9    # clears board
