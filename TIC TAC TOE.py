@@ -8,10 +8,28 @@ game_ended = False
 player1_points = 0 # initializes a point counter to be display after each match, and a final score display at the end of the game
 player2_points = 0
 
-player1_turn = random.choice([True, False]) # starts at random, if True player 1 plays first, if False player 2 or IA plays first
+player1_turn = random.choice([True, False]) # starts at random, if True player 1 plays first, if False player 2 or IA plays 
+if player1_turn == True : 
+    who_plays_first = 1
+else : 
+    who_plays_first = 2
 
 empty = "_" # for visualisation in the terminal 
 board = [empty] * 9 # we initialize a board, that is a 3x3 square so 9 values of index 0-8
+########################################### ALTERNATE WHO GETS TO PLAY FIRST EACH MATCH ###################################
+
+def alternate() : 
+    global who_plays_first, player1_turn
+
+    if who_plays_first == 1 :
+         who_plays_first = 2
+    else : 
+        who_plays_first = 1
+
+    if who_plays_first == 1 : 
+        player1_turn = True
+    else : 
+        player1_turn = False
 
 ########################################### IS THE CELL PLAYABLE FUNCTION #################################################
 
@@ -143,12 +161,11 @@ while True :
 
 while mode == 2 : # game loop that only stops if user inputs something other than yes on the replay? input
 
+    print("Player versus player game started!")
+    display_board(board) # initial display of the empty board
+
     while game_ended == False : # game_ended will be set to True by the check_if_game_ended function after each player turn, breaking this loop
                                 # and triggering the "replay?" option
-        
-        print("Player versus player game started!")
-        display_board(board) # initial display of the empty board
-
         if player1_turn : 
             print("PLAYER 1'S TURN! The board cells have matching numbers from 1 to 9 in reading order") # instructions for the player
             
@@ -187,7 +204,7 @@ while mode == 2 : # game loop that only stops if user inputs something other tha
         if replay == "yes":   
             board = [empty] * 9    # clears board
             game_ended = False     # removes the game_ended flag
-            player1_turn = random.choice([True, False])  # back to player 1 or 2 at random
+            alternate()
         else : 
             if player1_points > player2_points : 
                 print(f"Player 1 wins {player1_points} to {player2_points}!")
@@ -237,7 +254,7 @@ while mode == 1 : # game loop that only stops if user inputs something other tha
         if replay == "yes" or replay == "y ":   
             board = [empty] * 9    # clears board
             game_ended = False     # removes the game_ended flag
-            player1_turn = random.choice([True, False])  # back to player 1 or IA at random
+            alternate()
         else : 
             if player1_points > player2_points : 
                 print(f"Player 1 wins {player1_points} to {player2_points}!")
