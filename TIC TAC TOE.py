@@ -1,26 +1,26 @@
-import random # imports a library to be able to randomly pick from a list 
+import random # imports a library to be able to randomly pick from a list : used to initialize who plays first, used by IA to make random decisions
 
 player1_victory = False # initializes the bool flags that will become True when a victory/draw is detected
 player2_victory = False
 draw = False
 game_ended = False 
 
-player1_points = 0 # initializes a point counter to be display after each match 
+player1_points = 0 # initializes a point counter to be display after each match, and a final score display at the end of the game
 player2_points = 0
 
-player1_turn = random.choice([True, False]) # starts at random, player 1 plays first, when False, it's player2 or IA's turn to play 
+player1_turn = random.choice([True, False]) # starts at random, if True player 1 plays first, if False player 2 or IA plays first
 
 empty = "_" # for visualisation in the terminal 
 board = [empty] * 9 # we initialize a board, that is a 3x3 square so 9 values of index 0-8
 
-########################################### IS THE cell PLAYABLE FUNCTION #################################################
+########################################### IS THE CELL PLAYABLE FUNCTION #################################################
 
 def is_playable(board) : 
     """ Returns a list of the indexes of the cells that are empty and allowed to be played on """
     
-    possible_plays = [i for i in range(9) if board[i] == empty] # cleaner way
+    possible_plays = [i for i in range(9) if board[i] == empty] 
 
-    return possible_plays # returns the list for the IA to pick a default play from, or check if a human's player input is valid 
+    return possible_plays # returns the list for the IA to pick a play from, or check if a human's player input is valid 
 
 ########################################### IA PLAY FUNCTION #####################################################
 
@@ -28,42 +28,43 @@ def IA (board, sign) :
     """ Function that when called, returns the index of board it wants to play in 
         Returns False in case of an error """ # we will use that returned value to modify the board 
     
-    for player in ["O", "X"] : # Check if there's a horizontal win this turn, then a horizontal loss next turn and plays accordingly
-        for cell in [0, 3, 6] : 
-            if board[cell] == board[cell+1] == player and board[cell+2] == empty :
+    for player_sign in ["O", "X"] : # AI always plays circle, so first check all conditions with circle for an instant win this turn
+                                    # then, check all conditions with cross to block a potential enemy win next turn
+        for cell in [0, 3, 6] : # Check if there's a horizontal win this turn, then a horizontal loss next turn and plays accordingly
+            if board[cell] == board[cell+1] == player_sign and board[cell+2] == empty :
                 return cell + 2
-            elif board[cell] == board[cell+2] == player and board[cell+1] == empty :
+            elif board[cell] == board[cell+2] == player_sign and board[cell+1] == empty :
                 return cell + 1 
-            elif board[cell+1] == board[cell+2] == player and board[cell] == empty :
+            elif board[cell+1] == board[cell+2] == player_sign and board[cell] == empty :
                 return cell     
-
-    for player in ["O", "X"] : # Check if there's a vertical win this turn, then a vertical loss next turn and plays accordingly
+        
+        # Check if there's a vertical win this turn, then a vertical loss next turn and plays accordingly
         for cell in [0, 1, 2] : 
-            if board[cell] == board[cell+3] == player and board[cell+6] == empty : 
+            if board[cell] == board[cell+3] == player_sign and board[cell+6] == empty : 
                 return cell + 6 
-            if board[cell] == board[cell+6] == player and board[cell+3] == empty :  
+            if board[cell] == board[cell+6] == player_sign and board[cell+3] == empty :  
                 return cell + 3 
-            if board[cell+6] == board[cell+3] == player and board[cell] == empty : 
+            if board[cell+6] == board[cell+3] == player_sign and board[cell] == empty : 
                 return cell     
     
-    for player in ["O", "X"] : # check one diagonal for a win this turn, then a loss next turn and plays accordingly
-        if board[0] == board[4] == player and board[8] == empty : 
+        # check the descending diagonal for a win this turn, then a loss next turn and plays accordingly
+        if board[0] == board[4] == player_sign and board[8] == empty : 
             return 8
-        if board[0] == board[8] == player and board[4] == empty :  
+        if board[0] == board[8] == player_sign and board[4] == empty :  
             return 4
-        if board[4] == board[8] == player and board[0] == empty : 
+        if board[4] == board[8] == player_sign and board[0] == empty : 
             return 0
 
-    for player in ["O", "X"] : # check the other diagonal for a win this turn, then a loss next turn and plays accordingly
-        if board[2] == board[4] == player and board[6] == empty : 
+        # check the other diagonal for a win this turn, then a loss next turn and plays accordingly
+        if board[2] == board[4] == player_sign and board[6] == empty : 
             return 6
-        if board[2] == board[6] == player and board[4] == empty :  
+        if board[2] == board[6] == player_sign and board[4] == empty :  
             return 4
-        if board[4] == board[6] == player and board[2] == empty : 
+        if board[4] == board[6] == player_sign and board[2] == empty : 
             return 2
     
-    playable_corner = [i for i in [0, 2, 6, 8] if board[i] == empty]
-    if playable_corner != [] : # if a corner is available, will pick one at random
+    playable_corner = [i for i in [0, 2, 6, 8] if i in is_playable(board)]
+    if playable_corner != [] : # if previous conditions fails and a corner is available, will pick one at random
         return random.choice(playable_corner)
     else : 
         return random.choice(is_playable(board)) # if all else fails, randomly picks a spot to play on among the empty ones
@@ -78,13 +79,13 @@ def display_board(board):
     print(f"{board[3]}  {board[4]}  {board[5]}")
     print(f"{board[6]}  {board[7]}  {board[8]}")
 
-########################################### VICTORY CONDITIONS FUNCTION ##############################################""
+########################################### VICTORY/DRAW CONDITIONS FUNCTION ##############################################
 
-def end_of_game(board) : 
+def check_if_game_ended(board) : 
     """ called to check if any condition of end of game are met : a player victory or a draw 
     if so, globally changes the value of game_ended to True and updates the score
     Returns None """
-    global game_ended # the game_ended flag modifications has to be global so the gameplay loop can catch on it 
+    global game_ended # the game_ended flag modifications have to be global so the gameplay loop can catch on it 
     global player1_points
     global player2_points
 
@@ -123,8 +124,8 @@ def end_of_game(board) :
     for element in board : 
         if element != empty : 
             played_cell_counter +=1 
-    if played_cell_counter == 9 : # if the count reaches 9 and a victory didn't trigger earlier
-        board_full = True # FLAGS draw AS True
+    if played_cell_counter == 9 : 
+        board_full = True # if all 9 cells are played on, flags board_full AS True
 
     if board_full and not player1_victory and not player2_victory : 
         print("It's a draw!")
@@ -142,7 +143,7 @@ while True :
 
 while mode == 2 : # game loop that only stops if user inputs something other than yes on the replay? input
 
-    while game_ended == False : # game_ended will be set to True by the end_of_game function after each player turn, breaking this loop
+    while game_ended == False : # game_ended will be set to True by the check_if_game_ended function after each player turn, breaking this loop
                                 # and triggering the "replay?" option
         
         print("Player versus player game started!")
@@ -159,7 +160,7 @@ while mode == 2 : # game loop that only stops if user inputs something other tha
 
             board[play-1] = "X" # board updates
             display_board(board) # board shows its current state
-            end_of_game(board) # check if any end of game condition is met and updates game_ended Bool flag 
+            check_if_game_ended(board) # check if any end of game condition is met and updates game_ended Bool flag 
             if game_ended :
                 break # doesn't trigger player 2 turn, trigger replay? option
             player1_turn = False
@@ -168,24 +169,32 @@ while mode == 2 : # game loop that only stops if user inputs something other tha
             print("PLAYER 2'S TURN! The board cells have matching numbers from 1 to 9 in reading order")
 
             while True :
-                play = int(input("What cell does Player 2 places O on? ")) # player inputs the cell he plays on
-                if play-1 in is_playable(board) : # if it's not an empty cell, repeat the input request until it is 
+                play = int(input("What cell does Player 2 places O on? "))
+                if play-1 in is_playable(board) :
                     break
                 print(f'{play} is not an empty cell')
 
             board[play-1] = "O" 
             display_board(board)
-            end_of_game(board)
+            check_if_game_ended(board)
+            if game_ended :
+                break # doesn't trigger player 1 turn, trigger replay? option
             player1_turn = True
 
     if game_ended:     # a win / a draw is detected 
         print(f"SCORE : PLAYER ONE {player1_points} : {player2_points} PLAYER TWO")
         replay = input("Play again? Type yes or no ").lower()  # ask the user if they wanna replay
-        if replay == "yes" or replay == "y ":   
+        if replay == "yes":   
             board = [empty] * 9    # clears board
             game_ended = False     # removes the game_ended flag
             player1_turn = random.choice([True, False])  # back to player 1 or 2 at random
         else : 
+            if player1_points > player2_points : 
+                print(f"Player 1 wins {player1_points} to {player2_points}!")
+            elif player1_points < player2_points : 
+                print(f"Player 2 wins {player2_points} to {player1_points}!")
+            elif player1_points == player2_points : 
+                print(f"It's a tie! {player1_points} point each")
             print("Thanks for playing!") # bah casse toi alors ma foi???
             break
 
@@ -196,7 +205,7 @@ while mode == 1 : # game loop that only stops if user inputs something other tha
     print("Player vs IA game started!")
     display_board(board) # initial display of the empty board
 
-    while game_ended == False : # game_ended will be set to True by the end_of_game function after each player turn, breaking this loop
+    while game_ended == False : # game_ended will be set to True by the check_if_game_ended function after each player turn, breaking this loop
                                 # and triggering the "replay?" option
 
         if player1_turn : 
@@ -210,7 +219,7 @@ while mode == 1 : # game loop that only stops if user inputs something other tha
 
             board[play-1] = "X" # board updates
             display_board(board) # board shows its current state
-            end_of_game(board) # check if any end of game condition is met and updates game_ended Bool flag 
+            check_if_game_ended(board) # check if any end of game condition is met and updates game_ended Bool flag 
             if game_ended : # if so
                 break # doesn't trigger player 2 turn, trigger replay? option
             player1_turn = False # IA's turn now
@@ -219,7 +228,7 @@ while mode == 1 : # game loop that only stops if user inputs something other tha
             board[IA(board, "O")] = "O" # IA puts its circle at a random place through the function IA()
             print("IA's play :") # for a clean display of game board state 
             display_board(board)
-            end_of_game(board) # checks for a victory or a draw 
+            check_if_game_ended(board) # checks for a victory or a draw 
             player1_turn = True # Player's turn now
 
     if game_ended:     # a win / a draw is detected 
@@ -233,8 +242,8 @@ while mode == 1 : # game loop that only stops if user inputs something other tha
             if player1_points > player2_points : 
                 print(f"Player 1 wins {player1_points} to {player2_points}!")
             elif player1_points < player2_points : 
-                print(f"Player 2 wins {player2_points} to {player1_points}!")
+                print(f"The AI wins {player2_points} to {player1_points}!")
             elif player1_points == player2_points : 
                 print(f"It's a tie! {player1_points} point each")
-            print("Thanks for playing!") # bah casse toi alors ma foi???
+            print("Thanks for playing!") 
             break
