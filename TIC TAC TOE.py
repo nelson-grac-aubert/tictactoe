@@ -24,7 +24,7 @@ def is_playable(board) :
         if board[index] == empty : # if the case is playable on 
             possible_plays.append(index) # add that playable case in a list
 
-    return possible_plays # returns the list for the IA to pick a play from, or check if a human's player input is valid 
+    return possible_plays # returns the list for the IA to pick a default play from, or check if a human's player input is valid 
 
 ########################################### IA PLAY FUNCTION #####################################################
 
@@ -34,37 +34,40 @@ def IA (board, sign) :
     
     for player in ["O", "X"] : # Check if there's a horizontal win this turn, then a horizontal loss next turn and plays accordingly
         for case in [0, 3, 6] : 
-            if board[case] == board[case+1] == sign and board[case+2] == empty :
+            if board[case] == board[case+1] == player and board[case+2] == empty :
                 return case + 2
-            elif board[case] == board[case+2] == sign and board[case+1] == empty :
+            elif board[case] == board[case+2] == player and board[case+1] == empty :
                 return case + 1 
-            elif board[case+1] == board[case+2] == sign and board[case] == empty :
+            elif board[case+1] == board[case+2] == player and board[case] == empty :
                 return case     
 
     for player in ["O", "X"] : # Check if there's a vertical win this turn, then a vertical loss next turn and plays accordingly
         for case in [0, 1, 2] : 
-            if board[case] == board[case+3] == sign and board[case+6] == empty : 
+            if board[case] == board[case+3] == player and board[case+6] == empty : 
                 return case + 6 
-            if board[case] == board[case+6] == sign and board[case+3] == empty :  
+            if board[case] == board[case+6] == player and board[case+3] == empty :  
                 return case + 3 
-            if board[case+6] == board[case+3] == sign and board[case] == empty : 
+            if board[case+6] == board[case+3] == player and board[case] == empty : 
                 return case     
     
     for player in ["O", "X"] : # check one diagonal for a win this turn, then a loss next turn and plays accordingly
-        if board[0] == board[4] == sign and board[8] == empty : 
+        if board[0] == board[4] == player and board[8] == empty : 
             return 8
-        if board[0] == board[8] == sign and board[4] == empty :  
+        if board[0] == board[8] == player and board[4] == empty :  
             return 4
-        if board[4] == board[8] == sign and board[0] == empty : 
+        if board[4] == board[8] == player and board[0] == empty : 
             return 0
 
     for player in ["O", "X"] : # check the other diagonal for a win this turn, then a loss next turn and plays accordingly
-        if board[2] == board[4] == sign and board[6] == empty : 
+        if board[2] == board[4] == player and board[6] == empty : 
             return 6
-        if board[2] == board[6] == sign and board[4] == empty :  
+        if board[2] == board[6] == player and board[4] == empty :  
             return 4
-        if board[4] == board[6] == sign and board[2] == empty : 
+        if board[4] == board[6] == player and board[2] == empty : 
             return 2
+
+    if board == [empty] * 9 : # if the IA is first to play, always pick a corner
+        return random.choice([0,2,6,8]) 
 
     return random.choice(is_playable(board)) # randomly picks a spot to play on among the empty ones
 
