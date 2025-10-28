@@ -13,16 +13,12 @@ player1_turn = random.choice([True, False]) # starts at random, player 1 plays f
 empty = "_" # for visualisation in the terminal 
 board = [empty] * 9 # we initialize a board, that is a 3x3 square so 9 values of index 0-8
 
-########################################### IS THE CASE PLAYABLE FUNCTION #################################################
+########################################### IS THE cell PLAYABLE FUNCTION #################################################
 
 def is_playable(board) : 
-    """ Returns a list of the indexes of the cases that are empty and allowed to be played on """
+    """ Returns a list of the indexes of the cells that are empty and allowed to be played on """
     
-    possible_plays = []
-
-    for index in range(9) : # for all board cases
-        if board[index] == empty : # if the case is playable on 
-            possible_plays.append(index) # add that playable case in a list
+    possible_plays = [i for i in range(9) if board[i] == empty] # cleaner way
 
     return possible_plays # returns the list for the IA to pick a default play from, or check if a human's player input is valid 
 
@@ -33,22 +29,22 @@ def IA (board, sign) :
         Returns False in case of an error """ # we will use that returned value to modify the board 
     
     for player in ["O", "X"] : # Check if there's a horizontal win this turn, then a horizontal loss next turn and plays accordingly
-        for case in [0, 3, 6] : 
-            if board[case] == board[case+1] == player and board[case+2] == empty :
-                return case + 2
-            elif board[case] == board[case+2] == player and board[case+1] == empty :
-                return case + 1 
-            elif board[case+1] == board[case+2] == player and board[case] == empty :
-                return case     
+        for cell in [0, 3, 6] : 
+            if board[cell] == board[cell+1] == player and board[cell+2] == empty :
+                return cell + 2
+            elif board[cell] == board[cell+2] == player and board[cell+1] == empty :
+                return cell + 1 
+            elif board[cell+1] == board[cell+2] == player and board[cell] == empty :
+                return cell     
 
     for player in ["O", "X"] : # Check if there's a vertical win this turn, then a vertical loss next turn and plays accordingly
-        for case in [0, 1, 2] : 
-            if board[case] == board[case+3] == player and board[case+6] == empty : 
-                return case + 6 
-            if board[case] == board[case+6] == player and board[case+3] == empty :  
-                return case + 3 
-            if board[case+6] == board[case+3] == player and board[case] == empty : 
-                return case     
+        for cell in [0, 1, 2] : 
+            if board[cell] == board[cell+3] == player and board[cell+6] == empty : 
+                return cell + 6 
+            if board[cell] == board[cell+6] == player and board[cell+3] == empty :  
+                return cell + 3 
+            if board[cell+6] == board[cell+3] == player and board[cell] == empty : 
+                return cell     
     
     for player in ["O", "X"] : # check one diagonal for a win this turn, then a loss next turn and plays accordingly
         if board[0] == board[4] == player and board[8] == empty : 
@@ -67,10 +63,10 @@ def IA (board, sign) :
             return 2
     
     playable_corner = [i for i in [0, 2, 6, 8] if board[i] == empty]
-    if playable_corner != [] : 
+    if playable_corner != [] : # if a corner is available, will pick one at random
         return random.choice(playable_corner)
     else : 
-        return random.choice(is_playable(board)) # randomly picks a spot to play on among the empty ones
+        return random.choice(is_playable(board)) # if all else fails, randomly picks a spot to play on among the empty ones
 
 ########################################### DISPLAY BOARD FUNCTION ##############################################
 
@@ -116,15 +112,18 @@ def end_of_game(board) :
         player2_victory = True # DIAGONAL VICTORY FOR P2 
       
     if player2_victory : 
-        print("Player 2 wins!")
+        if mode == 2 : 
+            print("Player 2 wins!")
+        else : 
+            print("The AI wins!")
         game_ended = True
         player2_points += 1 
 
-    played_case_counter = 0 # counts how many cases are played on 
+    played_cell_counter = 0 # counts how many cells are played on 
     for element in board : 
         if element != empty : 
-            played_case_counter +=1 
-    if played_case_counter == 9 : # if the count reaches 9 and a victory didn't trigger earlier
+            played_cell_counter +=1 
+    if played_cell_counter == 9 : # if the count reaches 9 and a victory didn't trigger earlier
         board_full = True # FLAGS draw AS True
 
     if board_full and not player1_victory and not player2_victory : 
@@ -150,13 +149,13 @@ while mode == 2 : # game loop that only stops if user inputs something other tha
         display_board(board) # initial display of the empty board
 
         if player1_turn : 
-            print("PLAYER 1'S TURN! The board cases have matching numbers from 1 to 9 in reading order") # instructions for the player
+            print("PLAYER 1'S TURN! The board cells have matching numbers from 1 to 9 in reading order") # instructions for the player
             
             while True :
-                play = int(input("What case does Player 1 places X on? ")) # player inputs the case he plays on
-                if play-1 in is_playable(board) : # if it's not an empty case, repeat the input request until it is 
+                play = int(input("What cell does Player 1 places X on? ")) # player inputs the cell he plays on
+                if play-1 in is_playable(board) : # if it's not an empty cell, repeat the input request until it is 
                     break
-                print(f'{play} is not an empty case')
+                print(f'{play} is not an empty cell')
 
             board[play-1] = "X" # board updates
             display_board(board) # board shows its current state
@@ -166,13 +165,13 @@ while mode == 2 : # game loop that only stops if user inputs something other tha
             player1_turn = False
         
         if not player1_turn :
-            print("PLAYER 2'S TURN! The board cases have matching numbers from 1 to 9 in reading order")
+            print("PLAYER 2'S TURN! The board cells have matching numbers from 1 to 9 in reading order")
 
             while True :
-                play = int(input("What case does Player 2 places O on? ")) # player inputs the case he plays on
-                if play-1 in is_playable(board) : # if it's not an empty case, repeat the input request until it is 
+                play = int(input("What cell does Player 2 places O on? ")) # player inputs the cell he plays on
+                if play-1 in is_playable(board) : # if it's not an empty cell, repeat the input request until it is 
                     break
-                print(f'{play} is not an empty case')
+                print(f'{play} is not an empty cell')
 
             board[play-1] = "O" 
             display_board(board)
@@ -201,13 +200,13 @@ while mode == 1 : # game loop that only stops if user inputs something other tha
                                 # and triggering the "replay?" option
 
         if player1_turn : 
-            print("PLAYER 1'S TURN! The board cases have matching numbers from 1 to 9 in reading order") # instructions for the player
+            print("PLAYER 1'S TURN! The board cells have matching numbers from 1 to 9 in reading order") # instructions for the player
 
             while True :
-                play = int(input("What case does Player 1 places X on? ")) # player inputs the case he plays on
-                if play-1 in is_playable(board) : # if it's not an empty case, repeat the input request until it is 
+                play = int(input("What cell does Player 1 places X on? ")) # player inputs the cell he plays on
+                if play-1 in is_playable(board) : # if it's not an empty cell, repeat the input request until it is 
                     break
-                print(f'{play} is not an empty case')
+                print(f'{play} is not an empty cell')
 
             board[play-1] = "X" # board updates
             display_board(board) # board shows its current state
@@ -218,7 +217,7 @@ while mode == 1 : # game loop that only stops if user inputs something other tha
         
         if not player1_turn : # if its IA's turn
             board[IA(board, "O")] = "O" # IA puts its circle at a random place through the function IA()
-            print("Player2 IA's play :") # for a clean display of game board state 
+            print("IA's play :") # for a clean display of game board state 
             display_board(board)
             end_of_game(board) # checks for a victory or a draw 
             player1_turn = True # Player's turn now
@@ -236,6 +235,6 @@ while mode == 1 : # game loop that only stops if user inputs something other tha
             elif player1_points < player2_points : 
                 print(f"Player 2 wins {player2_points} to {player1_points}!")
             elif player1_points == player2_points : 
-                print(f"It's a tie! {player1_points} each")
+                print(f"It's a tie! {player1_points} point each")
             print("Thanks for playing!") # bah casse toi alors ma foi???
             break
