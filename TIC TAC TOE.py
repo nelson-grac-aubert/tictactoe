@@ -1,8 +1,3 @@
-#                                   *********  AT THE MOMENT PLAYER 1 IS ALWAYS X AND P2/IA ARE ALWAYS O ****************
-# player1_sign = 0 # initalizes the sign each player / the IA will use, one will take the value X later, one will take the value O
-# player2_sign = 0 # the other will be ignored and stay at 0 
-# IA_sign = 0                       *********  AT THE MOMENT PLAYER 1 IS ALWAYS X AND P2/IA ARE ALWAYS O ****************
-
 import random # imports a library to be able to randomly pick from a list 
 
 player1_victory = False # initializes the bool flags that will become True when a victory/draw is detected
@@ -12,7 +7,6 @@ game_ended = False
 
 player1_points = 0 # initializes a point counter to be display after each match 
 player2_points = 0
-
 
 player1_turn = random.choice([True, False]) # starts at random, player 1 plays first, when False, it's player2 or IA's turn to play 
 
@@ -34,13 +28,44 @@ def is_playable(board) :
 
 ########################################### IA PLAY FUNCTION #####################################################
 
-def IA (board, sign) : # IA function for the 1 player mode 
+def IA (board, sign) : 
     """ Function that when called, returns the index of board it wants to play in 
         Returns False in case of an error """ # we will use that returned value to modify the board 
-
-    #### coding a completely random IA so I can move on quickly to code the vs. IA gameplay loop 
-    #### will try to add an algorithm later
     
+    for player in ["O", "X"] : # Check if there's a horizontal win this turn, then a horizontal loss next turn and plays accordingly
+        for case in [0, 3, 6] : 
+            if board[case] == board[case+1] == sign and board[case+2] == empty :
+                return case + 2
+            elif board[case] == board[case+2] == sign and board[case+1] == empty :
+                return case + 1 
+            elif board[case+1] == board[case+2] == sign and board[case] == empty :
+                return case     
+
+    for player in ["O", "X"] : # Check if there's a vertical win this turn, then a vertical loss next turn and plays accordingly
+        for case in [0, 1, 2] : 
+            if board[case] == board[case+3] == sign and board[case+6] == empty : 
+                return case + 6 
+            if board[case] == board[case+6] == sign and board[case+3] == empty :  
+                return case + 3 
+            if board[case+6] == board[case+3] == sign and board[case] == empty : 
+                return case     
+    
+    for player in ["O", "X"] : # check one diagonal for a win this turn, then a loss next turn and plays accordingly
+        if board[0] == board[4] == sign and board[8] == empty : 
+            return 8
+        if board[0] == board[8] == sign and board[4] == empty :  
+            return 4
+        if board[4] == board[8] == sign and board[0] == empty : 
+            return 0
+
+    for player in ["O", "X"] : # check the other diagonal for a win this turn, then a loss next turn and plays accordingly
+        if board[2] == board[4] == sign and board[6] == empty : 
+            return 6
+        if board[2] == board[6] == sign and board[4] == empty :  
+            return 4
+        if board[4] == board[6] == sign and board[2] == empty : 
+            return 2
+
     return random.choice(is_playable(board)) # randomly picks a spot to play on among the empty ones
 
 ########################################### DISPLAY BOARD FUNCTION ##############################################
@@ -57,7 +82,7 @@ def display_board(board):
 
 def end_of_game(board) : 
     """ called to check if any condition of end of game are met : a player victory or a draw 
-    if so, globally changes the value of game_ended to True 
+    if so, globally changes the value of game_ended to True and updates the score
     Returns None """
     global game_ended # the game_ended flag modifications has to be global so the gameplay loop can catch on it 
     global player1_points
@@ -65,8 +90,7 @@ def end_of_game(board) :
 
     player1_victory = False # initializes the bool flags that will become True when an end of game condition is met 
     player2_victory = False
-    IA_victory = False
-    draw = False
+    board_full = False
 
     if board[0] == board[1] == board[2] == "X" or board[3] == board[4] == board[5] == "X" or board[6] == board[7] == board[8] == "X" : 
         player1_victory = True # HORIZONTAL VICTORY FOR P1
@@ -97,9 +121,9 @@ def end_of_game(board) :
         if element != empty : 
             played_case_counter +=1 
     if played_case_counter == 9 : # if the count reaches 9 and a victory didn't trigger earlier
-        draw = True # FLAGS draw AS True
+        board_full = True # FLAGS draw AS True
 
-    if draw and not player1_victory and not player2_victory : 
+    if board_full and not player1_victory and not player2_victory : 
         print("It's a draw!")
         game_ended = True
     
@@ -125,7 +149,7 @@ while mode == 2 : # game loop that only stops if user inputs something other tha
             print("PLAYER 1'S TURN! The board cases have matching numbers from 1 to 9 in reading order") # instructions for the player
             
             while True :
-                play = int(input("What case does Player 1 plays on? ")) # player inputs the case he plays on
+                play = int(input("What case does Player 1 places X on? ")) # player inputs the case he plays on
                 if play-1 in is_playable(board) : # if it's not an empty case, repeat the input request until it is 
                     break
                 print(f'{play} is not an empty case')
@@ -141,7 +165,7 @@ while mode == 2 : # game loop that only stops if user inputs something other tha
             print("PLAYER 2'S TURN! The board cases have matching numbers from 1 to 9 in reading order")
 
             while True :
-                play = int(input("What case does Player 2 plays on? ")) # player inputs the case he plays on
+                play = int(input("What case does Player 2 places O on? ")) # player inputs the case he plays on
                 if play-1 in is_playable(board) : # if it's not an empty case, repeat the input request until it is 
                     break
                 print(f'{play} is not an empty case')
@@ -171,13 +195,12 @@ while mode == 1 : # game loop that only stops if user inputs something other tha
 
     while game_ended == False : # game_ended will be set to True by the end_of_game function after each player turn, breaking this loop
                                 # and triggering the "replay?" option
-        
 
         if player1_turn : 
             print("PLAYER 1'S TURN! The board cases have matching numbers from 1 to 9 in reading order") # instructions for the player
 
             while True :
-                play = int(input("What case does Player 1 plays on? ")) # player inputs the case he plays on
+                play = int(input("What case does Player 1 places X on? ")) # player inputs the case he plays on
                 if play-1 in is_playable(board) : # if it's not an empty case, repeat the input request until it is 
                     break
                 print(f'{play} is not an empty case')
