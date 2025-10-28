@@ -65,11 +65,12 @@ def IA (board, sign) :
             return 4
         if board[4] == board[6] == player and board[2] == empty : 
             return 2
-
-    if board == [empty] * 9 : # if the IA is first to play, always pick a corner
-        return random.choice([0,2,6,8]) 
-
-    return random.choice(is_playable(board)) # randomly picks a spot to play on among the empty ones
+    
+    playable_corner = [i for i in [0, 2, 6, 8] if board[i] == empty]
+    if playable_corner != [] : 
+        return random.choice(playable_corner)
+    else : 
+        return random.choice(is_playable(board)) # randomly picks a spot to play on among the empty ones
 
 ########################################### DISPLAY BOARD FUNCTION ##############################################
 
@@ -160,7 +161,7 @@ while mode == 2 : # game loop that only stops if user inputs something other tha
             board[play-1] = "X" # board updates
             display_board(board) # board shows its current state
             end_of_game(board) # check if any end of game condition is met and updates game_ended Bool flag 
-            if game_ended : # if so
+            if game_ended :
                 break # doesn't trigger player 2 turn, trigger replay? option
             player1_turn = False
         
@@ -217,18 +218,24 @@ while mode == 1 : # game loop that only stops if user inputs something other tha
         
         if not player1_turn : # if its IA's turn
             board[IA(board, "O")] = "O" # IA puts its circle at a random place through the function IA()
-            print("Player2 IA's play :") # little print for a cute mise en page 
-            display_board(board) # displays current board state
+            print("Player2 IA's play :") # for a clean display of game board state 
+            display_board(board)
             end_of_game(board) # checks for a victory or a draw 
             player1_turn = True # Player's turn now
 
     if game_ended:     # a win / a draw is detected 
-        print(f"SCORE : PLAYER ONE {player1_points} : {player2_points} IA")
+        print(f"SCORE : PLAYER ONE {player1_points} : {player2_points} IA") # display current score
         replay = input("Play again? Type yes or no ").lower()  # ask the user if they wanna replay
         if replay == "yes" or replay == "y ":   
             board = [empty] * 9    # clears board
             game_ended = False     # removes the game_ended flag
             player1_turn = random.choice([True, False])  # back to player 1 or IA at random
         else : 
+            if player1_points > player2_points : 
+                print(f"Player 1 wins {player1_points} to {player2_points}!")
+            elif player1_points < player2_points : 
+                print(f"Player 2 wins {player2_points} to {player1_points}!")
+            elif player1_points == player2_points : 
+                print(f"It's a tie! {player1_points} each")
             print("Thanks for playing!") # bah casse toi alors ma foi???
             break
