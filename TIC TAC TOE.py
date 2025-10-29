@@ -1,10 +1,10 @@
-# imports a library to be able to randomly pick from a list
+# import a library to be able to randomly pick from a list
 import random 
 
-# initializes Bool flag that will be True when victory or draw is detected
+# initialize Bool flag that will be True when victory or draw is detected
 game_ended = False 
 
-# initializes a point counter to be displayed after each match
+# initialize a point counter to be displayed after each match
 player1_points = 0 
 player2_points = 0
 
@@ -12,12 +12,12 @@ player2_points = 0
 who_plays_first = random.choice([1,2]) 
 player1_turn = who_plays_first == 1    
 
-# we initialize a board, that is a 3x3 square so 9 values of index 0-8
+# initialize a board, that is a 3x3 square so 9 values of index 0-8
 empty = "_"  
 board = [empty] * 9 
 
 def display_board(board) :
-    """ Called to display the current state of the board
+    """ When called, displays the current state of the board
     Returns None """
 
     print(f"{board[0]}  {board[1]}  {board[2]}")
@@ -104,7 +104,7 @@ def check_if_game_ended(board) :
         print("It's a draw!")
         game_ended = True
 
-def IA (board,diff) : 
+def IA(board,sign) : 
     """ board is the current state of the game, diff is the difficulty
         Returns the index of board the AI will chose """ 
     
@@ -263,7 +263,7 @@ while mode == 1 :
                 break 
         
         if not player1_turn :
-            board[IA(board,difficulty)] = "O" 
+            board[IA(board,"O")] = "O" 
             print("IA's play :")
             display_board(board)
             check_if_game_ended(board)
