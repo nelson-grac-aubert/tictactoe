@@ -8,19 +8,18 @@ game_ended = False
 player1_points = 0 # initializes a point counter to be display after each match, and a final score display at the end of the game
 player2_points = 0
 
-player1_turn = random.choice([True, False]) # starts at random, if True player 1 plays first, if False player 2 or IA plays 
-if player1_turn == True : 
-    who_plays_first = 1
-else : 
-    who_plays_first = 2
+who_plays_first = random.choice([1,2])
+player1_turn = who_plays_first == 1 # True if 1, False if !=1 
 
 empty = "_" # for visualisation in the terminal 
 board = [empty] * 9 # we initialize a board, that is a 3x3 square so 9 values of index 0-8
-########################################### ALTERNATE WHO GETS TO PLAY FIRST EACH MATCH ###################################
+
+########################################### ALTERNATE WHO GETS TO PLAY FIRST EACH MATCH FUNCTION ###################################
 
 def alternate() : 
-    global who_plays_first, player1_turn
-
+    """ When called, alternates who gets to play first this match, and updates the player1_turn Bool accordingly, and returns None"""
+    global who_plays_first, player1_turn # global to access and change variables on the global scope, aka the whole code 
+                                         # we don't want to create a new local variable that'll disappear when the function call has returned 
     if who_plays_first == 1 :
          who_plays_first = 2
     else : 
@@ -31,7 +30,7 @@ def alternate() :
     else : 
         player1_turn = False
 
-########################################### IS THE CELL PLAYABLE FUNCTION #################################################
+########################################### IS THE CELL PLAYABLE FUNCTION ###########################################################
 
 def is_playable(board) : 
     """ Returns a list of the indexes of the cells that are empty and allowed to be played on """
@@ -40,7 +39,7 @@ def is_playable(board) :
 
     return possible_plays # returns the list for the IA to pick a play from, or check if a human's player input is valid 
 
-########################################### IA PLAY FUNCTION #####################################################
+########################################### IA PLAY FUNCTION ########################################################################
 
 def IA (board, sign) : 
     """ Function that when called, returns the index of board it wants to play in 
@@ -103,9 +102,7 @@ def check_if_game_ended(board) :
     """ called to check if any condition of end of game are met : a player victory or a draw 
     if so, globally changes the value of game_ended to True and updates the score
     Returns None """
-    global game_ended # the game_ended flag modifications have to be global so the gameplay loop can catch on it 
-    global player1_points
-    global player2_points
+    global game_ended, player1_points, player2_points # the game_ended flag modifications have to be global so the gameplay loop can catch on it 
 
     player1_victory = False # initializes the bool flags that will become True when an end of game condition is met 
     player2_victory = False
@@ -148,16 +145,38 @@ def check_if_game_ended(board) :
     if board_full and not player1_victory and not player2_victory : 
         print("It's a draw!")
         game_ended = True
-    
-######################################## MODE PICK ###################################################
+
+######################################## HUMAN PLAYER TURN FUNCTION ##############################################################
+
+def perform_player_turn(player_number, symbol):
+
+    print(f"PLAYER {player_number}'S TURN! The board cells have matching numbers from 1 to 9 in reading order")
+
+    while True:
+        try:
+            cell_choice = int(input(f"What cell does Player {player_number} place {symbol} on? "))
+            if cell_choice - 1 in is_playable(board): # -1 cause index are 0-8, but to be user friendly the cells are 1-9
+                break
+            print(f'{cell_choice} is not an empty cell')
+        except ValueError: # handles user input errors, typos 
+            print('Enter a number matching an empty cell (1-9)')
+
+    board[cell_choice - 1] = symbol # updates boards 
+    display_board(board)
+    check_if_game_ended(board) 
+
+######################################## MODE PICK #################################################################################
 
 while True : 
-    mode = int(input("How many players? Pick '1' (vs. IA) or '2' : "))
-    if mode == 1 or mode == 2 : 
-        break
-    print("Please pick a valid number")
+    try : 
+        mode = int(input("How many players? Pick '1' (vs. IA) or '2' : "))
+        if mode == 1 or mode == 2 : 
+            break
+        print("Please pick a valid number (1 or 2)")
+    except ValueError :
+        print("Please enter a number (1 or 2)")
     
-######################################## 2 PLAYER MODE ###############################################
+######################################## 2 PLAYER MODE #################################################################################
 
 while mode == 2 : # game loop that only stops if user inputs something other than yes on the replay? input
 
@@ -167,33 +186,13 @@ while mode == 2 : # game loop that only stops if user inputs something other tha
     while game_ended == False : # game_ended will be set to True by the check_if_game_ended function after each player turn, breaking this loop
                                 # and triggering the "replay?" option
         if player1_turn : 
-            print("PLAYER 1'S TURN! The board cells have matching numbers from 1 to 9 in reading order") # instructions for the player
-            
-            while True :
-                play = int(input("What cell does Player 1 places X on? ")) # player inputs the cell he plays on
-                if play-1 in is_playable(board) : # if it's not an empty cell, repeat the input request until it is 
-                    break
-                print(f'{play} is not an empty cell')
-
-            board[play-1] = "X" # board updates
-            display_board(board) # board shows its current state
-            check_if_game_ended(board) # check if any end of game condition is met and updates game_ended Bool flag 
+            perform_player_turn(1, "X") 
             if game_ended :
                 break # doesn't trigger player 2 turn, trigger replay? option
             player1_turn = False
         
         if not player1_turn :
-            print("PLAYER 2'S TURN! The board cells have matching numbers from 1 to 9 in reading order")
-
-            while True :
-                play = int(input("What cell does Player 2 places O on? "))
-                if play-1 in is_playable(board) :
-                    break
-                print(f'{play} is not an empty cell')
-
-            board[play-1] = "O" 
-            display_board(board)
-            check_if_game_ended(board)
+            perform_player_turn(2, "O") 
             if game_ended :
                 break # doesn't trigger player 1 turn, trigger replay? option
             player1_turn = True
@@ -212,7 +211,7 @@ while mode == 2 : # game loop that only stops if user inputs something other tha
                 print(f"Player 2 wins {player2_points} to {player1_points}!")
             elif player1_points == player2_points : 
                 print(f"It's a tie! {player1_points} point each")
-            print("Thanks for playing!") # bah casse toi alors ma foi???
+            print("Thanks for playing!")
             break
 
 ################################################ 1 PLAYER VS IA MODE ###################################################################
@@ -226,17 +225,7 @@ while mode == 1 : # game loop that only stops if user inputs something other tha
                                 # and triggering the "replay?" option
 
         if player1_turn : 
-            print("PLAYER 1'S TURN! The board cells have matching numbers from 1 to 9 in reading order") # instructions for the player
-
-            while True :
-                play = int(input("What cell does Player 1 places X on? ")) # player inputs the cell he plays on
-                if play-1 in is_playable(board) : # if it's not an empty cell, repeat the input request until it is 
-                    break
-                print(f'{play} is not an empty cell')
-
-            board[play-1] = "X" # board updates
-            display_board(board) # board shows its current state
-            check_if_game_ended(board) # check if any end of game condition is met and updates game_ended Bool flag 
+            perform_player_turn(1, "X")  
             if game_ended : # if so
                 break # doesn't trigger player 2 turn, trigger replay? option
             player1_turn = False # IA's turn now
@@ -251,7 +240,7 @@ while mode == 1 : # game loop that only stops if user inputs something other tha
     if game_ended:     # a win / a draw is detected 
         print(f"SCORE : PLAYER ONE {player1_points} : {player2_points} IA") # display current score
         replay = input("Play again? Type yes or no ").lower()  # ask the user if they wanna replay
-        if replay == "yes" or replay == "y ":   
+        if replay == "yes" :   
             board = [empty] * 9    # clears board
             game_ended = False     # removes the game_ended flag
             alternate()
