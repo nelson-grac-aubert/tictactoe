@@ -50,7 +50,7 @@ def is_playable(board) :
     return possible_plays  
 
 def check_if_game_ended(board) : 
-    """ Called to check for a player victory or a draw
+    """ When called, checks for a player victory or a draw
     If so, globally changes the value of game_ended to True and updates the score
     Returns None """
     global game_ended, player1_points, player2_points 
@@ -105,13 +105,13 @@ def check_if_game_ended(board) :
         game_ended = True
 
 def IA(board,sign) : 
-    """ board is the current state of the game, diff is the difficulty
+    """ board is the current state of the game, sign is always "O" 
         Returns the index of board the AI will chose """ 
     
     # check for an immediate win, then for a potential loss next turn
     # and return a play that wins now / prevent loss next turn
     if difficulty == 'hard' : 
-        for player_sign in ["O", "X"] :                     
+        for player_sign in [sign, "X"] :                     
             # horizontal check
             for cell in [0, 3, 6] : 
                 if board[cell] == board[cell+1] == player_sign and board[cell+2] == empty :
@@ -214,7 +214,7 @@ def perform_game_ending() :
             print("Please type 'yes' or 'no' ")
             continue
 
-# 2 player or 1 player vs. IA choice
+# 2 players or 1 player vs. IA choice
 while True : 
     try : 
         mode = int(input("How many players? Pick '1' (vs. IA) or '2' : "))
