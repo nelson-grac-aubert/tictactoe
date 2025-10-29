@@ -11,7 +11,7 @@ player1_turn = who_plays_first == 1
 empty = "_" # for visualisation in the terminal 
 board = [empty] * 9 # we initialize a board, that is a 3x3 square so 9 values of index 0-8
 
-def display_board(board):
+def display_board(board) :
     """ Called to display the current state of the board
     Returns None """
 
@@ -22,7 +22,7 @@ def display_board(board):
 def alternate() : 
     """ When called, alternates who gets to play first this match
         Updates the player1_turn Bool accordingly
-        Returns None"""
+        Returns None """
     global who_plays_first, player1_turn # global to access and change variables on the global scope, aka the whole code 
                                          # we don't want to create a new local variable that'll disappear when the function call has returned 
     if who_plays_first == 1 :
@@ -36,11 +36,11 @@ def alternate() :
         player1_turn = False
 
 def is_playable(board) : 
-    """ Returns a list of the indexes of the cells that are empty and allowed to be played on """
+    """ Returns a list of the indexes of the cells that are empty and allowed to be played on 
+        Used for the IA's algorithm and to check if player's inputs are valid """
     
     possible_plays = [i for i in range(9) if board[i] == empty] 
-
-    return possible_plays # returns the list for the IA to pick a play from, or check if a human's player input is valid 
+    return possible_plays  
 
 def check_if_game_ended(board) : 
     """ Called to check for a player victory or a draw
@@ -142,7 +142,7 @@ def IA (board,diff) :
 def perform_player_turn(player_number, symbol):
     """ When called, takes the player input for his turn
         Updates the board accordingly, displays it, then check for end of game conditions
-        Returns none"""
+        Gives next move to the opponent, Returns None"""
     global player1_turn
 
     print(f"PLAYER {player_number}'S TURN! The board cells have matching numbers from 1 to 9 in reading order")
@@ -175,7 +175,7 @@ def perform_game_ending() :
         print(f"SCORE : PLAYER ONE {player1_points} : {player2_points} AI")
     
     while True : 
-        replay = input("Play again? Type yes or no ").lower() # ask the user if they wanna replay
+        replay = input("Play again? Type yes or no ").lower() 
         if replay == "yes":   
             board = [empty] * 9  
             game_ended = False     
@@ -194,7 +194,7 @@ def perform_game_ending() :
             print("Thanks for playing!")
             break
         else : 
-            print("Please type 'yes' or 'no' ").lower()
+            print("Please type 'yes' or 'no' ")
             continue
 
 while True : # 2 player or 1 player vs. IA choice
