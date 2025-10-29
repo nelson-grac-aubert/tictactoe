@@ -1,15 +1,20 @@
-import random # imports a library to be able to randomly pick from a list
+# imports a library to be able to randomly pick from a list
+import random 
 
-game_ended = False # initializes Bool flag that will be True when victory or draw is detected
+# initializes Bool flag that will be True when victory or draw is detected
+game_ended = False 
 
-player1_points = 0 # initializes a point counter to be displayed after each match
+# initializes a point counter to be displayed after each match
+player1_points = 0 
 player2_points = 0
 
-who_plays_first = random.choice([1,2]) # player who gets to act first is random
+# player who gets to act first is random
+who_plays_first = random.choice([1,2]) 
 player1_turn = who_plays_first == 1    
 
-empty = "_" # for visualisation in the terminal 
-board = [empty] * 9 # we initialize a board, that is a 3x3 square so 9 values of index 0-8
+# we initialize a board, that is a 3x3 square so 9 values of index 0-8
+empty = "_"  
+board = [empty] * 9 
 
 def display_board(board) :
     """ Called to display the current state of the board
@@ -23,8 +28,10 @@ def alternate() :
     """ When called, alternates who gets to play first this match
         Updates the player1_turn Bool accordingly
         Returns None """
-    global who_plays_first, player1_turn # global to access and change variables on the global scope, aka the whole code 
-                                         # we don't want to create a new local variable that'll disappear when the function call has returned 
+    
+    # global to access and change variables on the global scope, aka the whole code 
+    global who_plays_first, player1_turn 
+                                          
     if who_plays_first == 1 :
          who_plays_first = 2
     else : 
@@ -36,7 +43,7 @@ def alternate() :
         player1_turn = False
 
 def is_playable(board) : 
-    """ Returns a list of the indexes of the cells that are empty and allowed to be played on 
+    """ Returns a list of the indexes of the cells that are allowed to be played on 
         Used for the IA's algorithm and to check if player's inputs are valid """
     
     possible_plays = [i for i in range(9) if board[i] == empty] 
@@ -48,28 +55,34 @@ def check_if_game_ended(board) :
     Returns None """
     global game_ended, player1_points, player2_points 
 
-    player1_victory = False # initializes the bool flags that will become True when an end of game condition is met 
+    # initialize Bool flags that will become True when win/draw condition is met 
+    player1_victory = False 
     player2_victory = False
     board_full = False
 
-    if board[0] == board[1] == board[2] == "X" or board[3] == board[4] == board[5] == "X" or board[6] == board[7] == board[8] == "X" : 
-        player1_victory = True # HORIZONTAL VICTORY FOR P1
-    elif board[0] == board[3] == board[6] == "X" or board[1] == board[4] == board[7] == "X" or board[2] == board[5] == board[8] == "X" : 
-        player1_victory = True # VERTICAL VICTORY FOR P1
+    # horizontal, then vertical, then diagonal win conditions
+    if board[0] == board[1] == board[2] == "X" or board[3] == board[4] == board[5] == "X" \
+    or board[6] == board[7] == board[8] == "X" : 
+        player1_victory = True 
+    elif board[0] == board[3] == board[6] == "X" or board[1] == board[4] == board[7] == "X" \
+    or board[2] == board[5] == board[8] == "X" : 
+        player1_victory = True
     elif board[0] == board[4] == board[8] == "X" or board[2] == board[4] == board[6] == "X" : 
-        player1_victory = True # DIAGONAL VICTORY FOR P1
+        player1_victory = True
     
     if player1_victory : 
         print("Player 1 wins!")
         game_ended = True
         player1_points += 1 
         
-    if board[0] == board[1] == board[2] == "O" or board[3] == board[4] == board[5] == "O" or board[6] == board[7] == board[8] == "O" : 
-        player2_victory = True # HORIZONTAL VICTORY FOR P2
-    elif board[0] == board[3] == board[6] == "O" or board[1] == board[4] == board[7] == "O" or board[2] == board[5] == board[8] == "O" : 
-        player2_victory = True # VERTICAL VICTORY FOR P2 
+    if board[0] == board[1] == board[2] == "O" or board[3] == board[4] == board[5] == "O" \
+    or board[6] == board[7] == board[8] == "O" : 
+        player2_victory = True 
+    elif board[0] == board[3] == board[6] == "O" or board[1] == board[4] == board[7] == "O" \
+    or board[2] == board[5] == board[8] == "O" : 
+        player2_victory = True 
     elif board[0] == board[4] == board[8] == "O" or board[2] == board[4] == board[6] == "O" : 
-        player2_victory = True # DIAGONAL VICTORY FOR P2 
+        player2_victory = True 
       
     if player2_victory : 
         if mode == 2 : 
@@ -79,7 +92,8 @@ def check_if_game_ended(board) :
         game_ended = True
         player2_points += 1 
 
-    played_cell_counter = 0 # if all 9 cells are played on, flags board_full as True
+    # draw conditions 
+    played_cell_counter = 0 
     for element in board : 
         if element != empty : 
             played_cell_counter +=1 
@@ -94,11 +108,11 @@ def IA (board,diff) :
     """ board is the current state of the game, diff is the difficulty
         Returns the index of board the AI will chose """ 
     
+    # check for an immediate win, then for a potential loss next turn
+    # and return a play that wins now / prevent loss next turn
     if difficulty == 'hard' : 
-        for player_sign in ["O", "X"] : # AI always plays circle, so first check all conditions with circle for an instant win this turn
-                                        # then, check all conditions with cross to block a potential enemy win next turn
-            
-            # check if there's a horizontal win this turn, then a horizontal loss next turn and plays accordingly
+        for player_sign in ["O", "X"] :                     
+            # horizontal check
             for cell in [0, 3, 6] : 
                 if board[cell] == board[cell+1] == player_sign and board[cell+2] == empty :
                     return cell + 2
@@ -106,8 +120,7 @@ def IA (board,diff) :
                     return cell + 1 
                 elif board[cell+1] == board[cell+2] == player_sign and board[cell] == empty :
                     return cell     
-            
-            # check if there's a vertical win this turn, then a vertical loss next turn and plays accordingly
+            # vertical check
             for cell in [0, 1, 2] : 
                 if board[cell] == board[cell+3] == player_sign and board[cell+6] == empty : 
                     return cell + 6 
@@ -115,16 +128,14 @@ def IA (board,diff) :
                     return cell + 3 
                 if board[cell+6] == board[cell+3] == player_sign and board[cell] == empty : 
                     return cell     
-        
-            # check the descending diagonal for a win this turn, then a loss next turn and plays accordingly
+            # descending diagonal check
             if board[0] == board[4] == player_sign and board[8] == empty : 
                 return 8
             if board[0] == board[8] == player_sign and board[4] == empty :  
                 return 4
             if board[4] == board[8] == player_sign and board[0] == empty : 
                 return 0
-
-            # check the other diagonal for a win this turn, then a loss next turn and plays accordingly
+            # ascending diagonal check
             if board[2] == board[4] == player_sign and board[6] == empty : 
                 return 6
             if board[2] == board[6] == player_sign and board[4] == empty :  
@@ -136,7 +147,8 @@ def IA (board,diff) :
     playable_corner = [i for i in [0, 2, 6, 8] if i in is_playable(board)]
     if playable_corner != [] and difficulty == 'hard': 
         return random.choice(playable_corner)
-    else : # if all else fails, or if difficulty is easy, randomly picks a spot to play on among the empty ones
+    # if all else fails, or if difficulty is easy, randomly picks a spot to play on among the empty ones
+    else : 
         return random.choice(is_playable(board)) 
 
 def perform_player_turn(player_number, symbol):
@@ -150,10 +162,13 @@ def perform_player_turn(player_number, symbol):
     while True:
         try:
             cell_choice = int(input(f"What cell does Player {player_number} place {symbol} on? "))
-            if cell_choice - 1 in is_playable(board): # -1 be cause list index are 0-8, but to be user friendly the cells are 1-9
+            # -1 because list index are 0-8, but to be user friendly the cells are 1-9
+            if cell_choice - 1 in is_playable(board): 
                 break
             print(f'{cell_choice} is not an empty cell')
-        except ValueError: # handles user input errors, typos 
+
+        # handles user input errors, typos 
+        except ValueError: 
             print('Enter a number matching an empty cell (1-9)')
 
     board[cell_choice - 1] = symbol
@@ -182,7 +197,8 @@ def perform_game_ending() :
             alternate()
             break
         elif replay == "no" : 
-            mode = 0 # breaks out of the gameplay loop 
+            # breaks out of the gameplay loop 
+            mode = 0 
             if player1_points > player2_points : 
                 print(f"Player 1 wins {player1_points} to {player2_points}!")
             elif player1_points < player2_points and mode == 2 : 
@@ -194,10 +210,12 @@ def perform_game_ending() :
             print("Thanks for playing!")
             break
         else : 
+            # handles user input errors
             print("Please type 'yes' or 'no' ")
             continue
 
-while True : # 2 player or 1 player vs. IA choice
+# 2 player or 1 player vs. IA choice
+while True : 
     try : 
         mode = int(input("How many players? Pick '1' (vs. IA) or '2' : "))
         if mode == 1 or mode == 2 : 
@@ -206,13 +224,15 @@ while True : # 2 player or 1 player vs. IA choice
     except ValueError :
         print("Please enter a number (1 or 2)")
 
-while mode == 1 : # IA difficulty choice
+# IA difficulty choice
+while mode == 1 : 
     difficulty = input("What difficulty? 'easy' or 'hard' : ")
     if difficulty == 'easy' or difficulty == 'hard' : 
         break
     print("Invalid input, please try again")
 
-while mode == 2 : # 2 players gameplay loop
+# 2 players gameplay loop
+while mode == 2 : 
 
     print("Player versus player game started!")
     display_board(board) 
@@ -221,13 +241,15 @@ while mode == 2 : # 2 players gameplay loop
         if player1_turn : 
             perform_player_turn(1, "X") 
             if game_ended :
-                break # doesn't trigger player 2 turn, triggers replay? input
+                # doesn't trigger player 2 turn, triggers replay? input
+                break 
         if not player1_turn :
             perform_player_turn(2, "O") 
             
     perform_game_ending()
 
-while mode == 1 : # 1 player gameplay loop 
+# 1 player gameplay loop 
+while mode == 1 : 
 
     print("Player vs IA game started!")
     display_board(board)
@@ -237,7 +259,8 @@ while mode == 1 : # 1 player gameplay loop
         if player1_turn : 
             perform_player_turn(1, "X")  
             if game_ended : 
-                break # doesn't trigger AI turn, triggers replay? input
+                # doesn't trigger AI turn, triggers replay? input
+                break 
         
         if not player1_turn :
             board[IA(board,difficulty)] = "O" 
