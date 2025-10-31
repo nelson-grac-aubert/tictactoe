@@ -199,14 +199,12 @@ def perform_game_ending() :
             alternate(who_plays_first)
             break
         elif replay == "no" : 
-            # breaks out of the gameplay loop 
+            # # breaks out of the gameplay loop 
             mode = 0 
             if player1_points > player2_points : 
                 print(f"Player 1 wins {player1_points} to {player2_points}!")
-            elif player1_points < player2_points and mode == 2 : 
+            elif player1_points < player2_points : 
                 print(f"Player 2 wins {player2_points} to {player1_points}!")
-            elif player1_points < player2_points and mode == 1 : 
-                print(f"The AI wins {player2_points} to {player1_points}!")
             elif player1_points == player2_points : 
                 print(f"It's a tie! {player1_points} point each")
             print("Thanks for playing!")
