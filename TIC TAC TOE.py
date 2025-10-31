@@ -24,19 +24,21 @@ def display_board(board) :
     print(f"{board[3]}  {board[4]}  {board[5]}")
     print(f"{board[6]}  {board[7]}  {board[8]}")
 
-def alternate() : 
+def alternate(who_plays_first) : 
     """ When called, alternates who gets to play first this match
         Updates the player1_turn Bool accordingly
         Returns None """
     
     # global to access and change variables on the global scope, aka the whole code 
-    global who_plays_first, player1_turn 
+    global player1_turn 
                                           
     if who_plays_first == 1 : who_plays_first = 2
     else : who_plays_first = 1
 
     if who_plays_first == 1 : player1_turn = True
     else : player1_turn = False
+
+    return who_plays_first
 
 def is_playable(board) : 
     """ Returns a list of the indexes of the cells that are allowed to be played on 
@@ -194,7 +196,7 @@ def perform_game_ending() :
         if replay == "yes":   
             board = [empty] * 9  
             game_ended = False     
-            alternate()
+            alternate(who_plays_first)
             break
         elif replay == "no" : 
             # breaks out of the gameplay loop 
