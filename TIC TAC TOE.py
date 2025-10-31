@@ -1,21 +1,3 @@
-# import a library to be able to randomly pick from a list
-import random 
-
-# initialize Bool flag that will be True when victory or draw is detected
-game_ended = False 
-
-# initialize a point counter to be displayed after each match
-player1_points = 0 
-player2_points = 0
-
-# player who gets to act first is random
-who_plays_first = random.choice([1,2]) 
-player1_turn = who_plays_first == 1    
-
-# initialize a board, that is a 3x3 square so 9 values of index 0-8
-empty = "_"  
-board = [empty] * 9 
-
 def display_board(board) :
     """ When called, displays the current state of the board
     Returns None """
@@ -32,15 +14,11 @@ def alternate() :
     # global to access and change variables on the global scope, aka the whole code 
     global who_plays_first, player1_turn 
                                           
-    if who_plays_first == 1 :
-         who_plays_first = 2
-    else : 
-        who_plays_first = 1
+    if who_plays_first == 1 : who_plays_first = 2
+    else : who_plays_first = 1
 
-    if who_plays_first == 1 : 
-        player1_turn = True
-    else : 
-        player1_turn = False
+    if who_plays_first == 1 : player1_turn = True
+    else : player1_turn = False
 
 def is_playable(board) : 
     """ Returns a list of the indexes of the cells that are allowed to be played on 
@@ -108,6 +86,9 @@ def IA(board,sign) :
     """ board is the current state of the game, sign is always "O" 
         Returns the index of board the AI will chose """ 
     
+    print("Let me think...")
+    time.sleep(1)
+
     # check for an immediate win, then for a potential loss next turn
     # and return a play that wins now / prevent loss next turn
     if difficulty == 'hard' : 
@@ -175,6 +156,7 @@ def perform_player_turn(player_number, symbol):
     display_board(board)
     check_if_game_ended(board) 
 
+    # right part is a Bool, True if currently player 2 turn  
     player1_turn = player_number != 1 
 
 def perform_game_ending() : 
@@ -212,7 +194,24 @@ def perform_game_ending() :
         else : 
             # handles user input errors
             print("Please type 'yes' or 'no' ")
-            continue
+            
+# import a library to randomly pick from a list
+import random 
+# import a library to add artificial delay on AI decisions
+import time
+
+# initialize Bool flag that will be True when victory or draw is detected
+game_ended = False 
+# initialize a point counter to be displayed after each match
+player1_points = 0 
+player2_points = 0
+# initialize a board, that is a 3x3 square so 9 list values of index 0-8
+empty = "_"  
+board = [empty] * 9 
+
+# player who gets to act first is random
+who_plays_first = random.choice([1,2]) 
+player1_turn = who_plays_first == 1  
 
 # 2 players or 1 player vs. IA choice
 while True : 
