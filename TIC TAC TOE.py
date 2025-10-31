@@ -1,3 +1,21 @@
+# import a library to randomly pick from a list
+import random 
+# import a library to add artificial delay on AI decisions
+import time 
+
+# initialize Bool flag that will be True when victory or draw is detected
+game_ended = False 
+# initialize a point counter to be displayed after each match
+player1_points = 0 
+player2_points = 0
+# initialize a board, that is a 3x3 square so 9 list values of index 0-8
+empty = "_"  
+board = [empty] * 9 
+
+# player who gets to act first is random
+who_plays_first = random.choice([1,2]) 
+player1_turn = who_plays_first == 1  
+
 def display_board(board) :
     """ When called, displays the current state of the board
     Returns None """
@@ -194,78 +212,69 @@ def perform_game_ending() :
         else : 
             # handles user input errors
             print("Please type 'yes' or 'no' ")
-            
-# import a library to randomly pick from a list
-import random 
-# import a library to add artificial delay on AI decisions
-import time
 
-# initialize Bool flag that will be True when victory or draw is detected
-game_ended = False 
-# initialize a point counter to be displayed after each match
-player1_points = 0 
-player2_points = 0
-# initialize a board, that is a 3x3 square so 9 list values of index 0-8
-empty = "_"  
-board = [empty] * 9 
+def gameplay() :
+    """ Game mode selection, IA difficulty selection if relevant
+    Gameplay loop """
 
-# player who gets to act first is random
-who_plays_first = random.choice([1,2]) 
-player1_turn = who_plays_first == 1  
+    global game_ended, player1_points, player2_points, player1_turn, \
+    board, who_plays_first, difficulty, mode
 
-# 2 players or 1 player vs. IA choice
-while True : 
-    try : 
-        mode = int(input("How many players? Pick '1' (vs. IA) or '2' : "))
-        if mode == 1 or mode == 2 : 
+    # 2 players or 1 player vs. IA choice
+    while True : 
+        try : 
+            mode = int(input("How many players? Pick '1' (vs. IA) or '2' : "))
+            if mode == 1 or mode == 2 : 
+                break
+            print("Please pick a valid number (1 or 2)")
+        except ValueError :
+            print("Please enter a number (1 or 2)")
+
+    # IA difficulty choice
+    while mode == 1 : 
+        difficulty = input("What difficulty? 'easy' or 'hard' : ")
+        if difficulty == 'easy' or difficulty == 'hard' : 
             break
-        print("Please pick a valid number (1 or 2)")
-    except ValueError :
-        print("Please enter a number (1 or 2)")
+        print("Invalid input, please try again")
 
-# IA difficulty choice
-while mode == 1 : 
-    difficulty = input("What difficulty? 'easy' or 'hard' : ")
-    if difficulty == 'easy' or difficulty == 'hard' : 
-        break
-    print("Invalid input, please try again")
+    # 2 players gameplay loop
+    while mode == 2 : 
 
-# 2 players gameplay loop
-while mode == 2 : 
+        print("Player versus player game started!")
+        display_board(board) 
 
-    print("Player versus player game started!")
-    display_board(board) 
+        while game_ended == False : 
+            if player1_turn : 
+                perform_player_turn(1, "X") 
+                if game_ended :
+                    # doesn't trigger player 2 turn, triggers replay? input
+                    break 
+            if not player1_turn :
+                perform_player_turn(2, "O") 
+                
+        perform_game_ending()
 
-    while game_ended == False : 
-        if player1_turn : 
-            perform_player_turn(1, "X") 
-            if game_ended :
-                # doesn't trigger player 2 turn, triggers replay? input
-                break 
-        if not player1_turn :
-            perform_player_turn(2, "O") 
+    # 1 player gameplay loop 
+    while mode == 1 : 
+
+        print("Player vs IA game started!")
+        display_board(board)
+
+        while game_ended == False : 
+
+            if player1_turn : 
+                perform_player_turn(1, "X")  
+                if game_ended : 
+                    # doesn't trigger AI turn, triggers replay? input
+                    break 
             
-    perform_game_ending()
+            if not player1_turn :
+                board[IA(board,"O")] = "O" 
+                print("IA's play :")
+                display_board(board)
+                check_if_game_ended(board)
+                player1_turn = True
+    
+        perform_game_ending()
 
-# 1 player gameplay loop 
-while mode == 1 : 
-
-    print("Player vs IA game started!")
-    display_board(board)
-
-    while game_ended == False : 
-
-        if player1_turn : 
-            perform_player_turn(1, "X")  
-            if game_ended : 
-                # doesn't trigger AI turn, triggers replay? input
-                break 
-        
-        if not player1_turn :
-            board[IA(board,"O")] = "O" 
-            print("IA's play :")
-            display_board(board)
-            check_if_game_ended(board)
-            player1_turn = True
- 
-    perform_game_ending()
+gameplay()
